@@ -1,12 +1,12 @@
 # MaidCare
 
-The operations app that runs [Maid Care Home Services](https://www.google.com/search?q=Maid+Care+Home+Services+Dundalk+MD),
+The operations app that runs [Maid Care Home Services](https://www.maidcare.pro/),
 a residential and commercial cleaning business in Maryland. It holds
 the customers, their homes and service plans, the schedule, the vans' GPS, the
 invoices, expenses, contractor pay and inventory, in one place for the owner
 and the office staff.
 
-**[Live demo →](https://DEMO-URL-HERE)** Sign in as the owner or as staff with
+**[Live demo →](https://maidcare-ops-demo.vercel.app)** Sign in as the owner or as staff with
 one click. Everything in the demo is made up (no real customer, payment or
 location data), and it resets every night.
 
