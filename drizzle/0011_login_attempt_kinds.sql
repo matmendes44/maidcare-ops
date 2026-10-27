@@ -1,0 +1,2 @@
+ALTER TABLE "login_attempts" ADD COLUMN "kind" text DEFAULT 'password' NOT NULL;--> statement-breakpoint
+ALTER TABLE "login_attempts" ADD CONSTRAINT "login_attempts_kind_check" CHECK (kind = ANY (ARRAY['password'::text, 'code'::text, 'reauth'::text]));

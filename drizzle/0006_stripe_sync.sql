@@ -1,0 +1,1 @@
+ALTER TABLE "customers" ADD COLUMN "stripe_sync_error" text;

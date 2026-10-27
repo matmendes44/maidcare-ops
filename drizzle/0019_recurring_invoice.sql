@@ -1,0 +1,2 @@
+ALTER TABLE "quotes" ADD COLUMN "recurring_invoice_id" bigint;--> statement-breakpoint
+ALTER TABLE "quotes" ADD CONSTRAINT "quotes_recurring_invoice_id_fkey" FOREIGN KEY ("recurring_invoice_id") REFERENCES "public"."invoices"("id") ON DELETE set null ON UPDATE no action;

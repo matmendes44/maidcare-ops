@@ -1,0 +1,434 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-brand-green: var(--brand-green);
+  --color-brand-blue: var(--brand-blue);
+  --color-link: var(--link);
+  --color-tabbar: var(--tabbar);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Brand colors. White text on --brand-green is below 4.5:1 contrast, so the
+     green is used for tints, borders and icons, never behind text. */
+  --brand-green: #63ae33;
+  --brand-blue: #3174e7;
+
+  --background: #ffffff;
+  --foreground: #1a2433;
+  --card: #ffffff;
+  --card-foreground: #1a2433;
+  --popover: #ffffff;
+  --popover-foreground: #1a2433;
+  --primary: var(--brand-blue);
+  --primary-foreground: #ffffff;
+  --secondary: #eaf1fd;
+  --secondary-foreground: #1c4fa6;
+  --muted: #f4f6f9;
+  --muted-foreground: #576172;
+  --accent: #eef7e8;
+  --accent-foreground: #3b7419;
+  --destructive: #d23b30;
+  --border: #e2e7ee;
+  --input: #ccd4df;
+  --ring: var(--brand-blue);
+  /* text-safe darker shade of the brand blue for links */
+  --link: #1f5fcc;
+  /* record tab bar (white text on it, in both themes) */
+  --tabbar: #1f5fcc;
+  --success: #eef7e8;
+  --success-foreground: #36701a;
+  --info: #eaf1fd;
+  --info-foreground: #1c4fa6;
+  --chart-1: var(--brand-blue);
+  --chart-2: var(--brand-green);
+  --chart-3: #1c4fa6;
+  --chart-4: #3b7419;
+  --chart-5: #8fb8f3;
+  --radius: 0.375rem;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #1a2433;
+  --sidebar-primary: var(--brand-blue);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef7e8;
+  --sidebar-accent-foreground: #3b7419;
+  --sidebar-border: #e2e7ee;
+  --sidebar-ring: var(--brand-blue);
+}
+
+.dark {
+  /* Navy surfaces with the same brand hues; text-safe lighter shades for
+     links and tinted badges. */
+  --background: #0e1621;
+  --foreground: #e6edf5;
+  --card: #141e2b;
+  --card-foreground: #e6edf5;
+  --popover: #172231;
+  --popover-foreground: #e6edf5;
+  --primary: var(--brand-blue);
+  --primary-foreground: #ffffff;
+  --secondary: #1a2b44;
+  --secondary-foreground: #bcd4ff;
+  --muted: #18222f;
+  --muted-foreground: #9aa8ba;
+  --accent: #1c2d19;
+  --accent-foreground: #a9df85;
+  --destructive: #f2685c;
+  --border: #253244;
+  --input: #34445a;
+  --ring: #5b93f0;
+  --link: #8ab6ff;
+  --tabbar: #1b4a96;
+  --success: #1c2d19;
+  --success-foreground: #a9df85;
+  --info: #1a2b44;
+  --info-foreground: #bcd4ff;
+  --chart-1: #5b93f0;
+  --chart-2: var(--brand-green);
+  --chart-3: #bcd4ff;
+  --chart-4: #a9df85;
+  --chart-5: #3174e7;
+  --sidebar: #121b27;
+  --sidebar-foreground: #e6edf5;
+  --sidebar-primary: var(--brand-blue);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1c2d19;
+  --sidebar-accent-foreground: #a9df85;
+  --sidebar-border: #253244;
+  --sidebar-ring: #5b93f0;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    /* 18px base (from 16px) so everything sized in rem, text and controls
+       alike, scales up together. A percentage keeps the browser's own text
+       size setting working. */
+    font-size: 112.5%;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight text-foreground;
+  }
+}
+/* Sign-in page background (components/login-background.tsx): the walker and
+   the shine share one duration and linear timing, so the clean streak ends
+   right at the vacuum head as it crosses the screen. */
+.login-scene {
+  --login-cross: 26s;
+  --login-floor: 28px;
+}
+.login-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(40rem 26rem at 12% 18%, color-mix(in oklab, var(--brand-blue) 9%, transparent), transparent 70%),
+    radial-gradient(36rem 24rem at 88% 78%, color-mix(in oklab, var(--brand-green) 10%, transparent), transparent 70%);
+}
+.login-bubble {
+  position: absolute;
+  bottom: -3rem;
+  border-radius: 9999px;
+  border: 1.5px solid color-mix(in oklab, var(--brand-blue) 28%, transparent);
+  background: radial-gradient(circle at 32% 30%, rgb(255 255 255 / 0.55), color-mix(in oklab, var(--brand-blue) 6%, transparent) 60%);
+  animation-name: login-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: backwards;
+}
+.dark .login-bubble {
+  border-color: color-mix(in oklab, var(--brand-blue) 50%, transparent);
+  background: radial-gradient(circle at 32% 30%, rgb(255 255 255 / 0.22), transparent 55%);
+}
+@keyframes login-rise {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translate(14px, -55vh); }
+  90% { opacity: 0.9; }
+  100% { transform: translate(-6px, -110vh); opacity: 0; }
+}
+.login-floor {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--login-floor);
+  height: 1px;
+  background: color-mix(in oklab, var(--foreground) 12%, transparent);
+}
+.login-shine {
+  position: absolute;
+  bottom: var(--login-floor);
+  left: -60px;
+  width: calc(100vw + 180px);
+  height: 6px;
+  transform-origin: left;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--brand-green) 10%, transparent), color-mix(in oklab, var(--brand-green) 45%, transparent) 80%, color-mix(in oklab, var(--brand-blue) 55%, transparent));
+  border-radius: 9999px 9999px 0 0;
+  animation: login-shine var(--login-cross) linear infinite;
+}
+@keyframes login-shine {
+  0% { transform: scaleX(0); opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+.login-walker {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--login-floor) - 8px);
+  animation: login-walk var(--login-cross) linear infinite;
+}
+@keyframes login-walk {
+  from { transform: translateX(-160px); }
+  to { transform: translateX(calc(100vw + 20px)); }
+}
+.login-walker svg * {
+  transform-box: view-box;
+}
+.login-leg-back,
+.login-leg-front {
+  transform-origin: 45px 74px;
+  animation: login-step 0.9s ease-in-out infinite alternate;
+}
+.login-leg-back { animation-direction: alternate-reverse; }
+@keyframes login-step {
+  from { transform: rotate(16deg); }
+  to { transform: rotate(-16deg); }
+}
+.login-body { animation: login-bob 0.45s ease-in-out infinite alternate; }
+@keyframes login-bob {
+  to { transform: translateY(-1.5px); }
+}
+.login-vacuum { animation: login-hum 0.12s linear infinite alternate; }
+@keyframes login-hum {
+  to { transform: translateX(0.7px); }
+}
+.login-walker svg .login-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: login-sparkle 1.4s ease-out infinite;
+}
+.login-sparkle-2 { animation-delay: 0.45s !important; }
+.login-sparkle-3 { animation-delay: 0.9s !important; }
+@keyframes login-sparkle {
+  0% { opacity: 0; transform: translateY(0) scale(0.4); }
+  30% { opacity: 1; transform: translateY(-4px) scale(1); }
+  100% { opacity: 0; transform: translateY(-14px) scale(0.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-scene *,
+  .login-walker svg * {
+    animation: none !important;
+  }
+  .login-walker { left: 8%; }
+  .login-shine { display: none; }
+  .login-bubble { bottom: 30%; opacity: 0.6; }
+}
+
+/* Phone layout for tables marked <Table stack> (components/ui/table.tsx):
+   each row becomes a card. The data-primary cell is the title; every other
+   cell is a "Label  value" line, labelled from its data-label. */
+@media (max-width: 639.98px) {
+  table[data-stack] thead {
+    display: none;
+  }
+  table[data-stack],
+  table[data-stack] > tbody,
+  table[data-stack] > tfoot {
+    display: block;
+    width: 100%;
+  }
+  table[data-stack] tr {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.85rem 1rem;
+  }
+  table[data-stack] td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0;
+    min-width: 0;
+    white-space: normal;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  table[data-stack] td > * {
+    min-width: 0;
+  }
+  table[data-stack] td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+  }
+  table[data-stack] td[data-primary] {
+    display: block;
+    text-align: left;
+    font-size: 1rem;
+    margin-bottom: 0.15rem;
+  }
+  /* a cell holding only a full-width message (empty state) */
+  table[data-stack] td[colspan] {
+    display: block;
+    text-align: center;
+  }
+  table[data-stack] td[data-hide-empty]:empty,
+  table[data-stack] td[data-phone-hidden] {
+    display: none;
+  }
+}
+@media (max-width: 639.98px) {
+  /* the title cell leads the card wherever its column sits */
+  table[data-stack] td[data-primary] {
+    order: -1;
+  }
+}
+@media (max-width: 639.98px) {
+  /* row actions (e.g. an Edit link) go last, left-aligned */
+  table[data-stack] td[data-actions] {
+    order: 99;
+    justify-content: flex-start;
+  }
+  /* footer rows (totals): label left, amount right */
+  table[data-stack] > tfoot tr {
+    grid-template-columns: 1fr auto;
+    padding-block: 0.6rem;
+  }
+  table[data-stack] > tfoot td,
+  table[data-stack] > tfoot td[colspan] {
+    display: block;
+    text-align: left;
+  }
+  table[data-stack] > tfoot td:last-child {
+    text-align: right;
+  }
+}
+@media (max-width: 639.98px) {
+  /* label on the left; the value's parts (say a name and an address) stack
+     on the right instead of sitting side by side */
+  table[data-stack] td[data-label] {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1rem;
+    row-gap: 0.1rem;
+    align-items: baseline;
+    justify-items: end;
+  }
+  table[data-stack] td[data-label]::before {
+    grid-column: 1;
+    grid-row: 1 / span 8;
+    align-self: start;
+    justify-self: start;
+  }
+  table[data-stack] td[data-label] > * {
+    grid-column: 2;
+  }
+}
+
+/* Fleet map markers (app/(app)/fleet/fleet-map.tsx) */
+.fleet-vehicle {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  border: 2px solid #fff;
+  background: var(--brand-blue);
+  color: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+.fleet-vehicle.is-running {
+  background: var(--brand-green);
+  animation: fleet-pulse 1.8s ease-out infinite;
+}
+@keyframes fleet-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand-green) 55%, transparent); }
+  100% { box-shadow: 0 0 0 12px transparent; }
+}
+.fleet-stop {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 2px solid var(--brand-blue);
+  background: #fff;
+  color: var(--brand-blue);
+  font: 700 12px/1 var(--font-sans, sans-serif);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+.fleet-stop-here { border-color: #d97706; color: #b45309; }
+.fleet-stop-done { border-color: var(--brand-green); background: var(--brand-green); color: #fff; }
+.leaflet-tooltip.fleet-label {
+  padding: 1px 6px;
+  border: 0;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+.leaflet-tooltip.fleet-label::before { display: none; }
+/* darker map tiles in dark mode */
+.dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+.dark .leaflet-container { background: #1b2430; }
+@media (prefers-reduced-motion: reduce) {
+  .fleet-vehicle.is-running { animation: none; }
+}

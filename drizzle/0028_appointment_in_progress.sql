@@ -1,0 +1,2 @@
+ALTER TABLE "appointments" DROP CONSTRAINT "appointments_status_check";--> statement-breakpoint
+ALTER TABLE "appointments" ADD CONSTRAINT "appointments_status_check" CHECK (status = ANY (ARRAY['pending'::text, 'in_progress'::text, 'completed'::text, 'canceled'::text]));

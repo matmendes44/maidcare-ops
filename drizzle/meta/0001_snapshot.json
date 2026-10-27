@@ -1,0 +1,1437 @@
+{
+  "id": "1092fd62-68de-40aa-b307-69c11ecc42b9",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.appointments": {
+      "name": "appointments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "service_plan_id": {
+          "name": "service_plan_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduled_start": {
+          "name": "scheduled_start",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scheduled_end": {
+          "name": "scheduled_end",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_arrival": {
+          "name": "actual_arrival",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_departure": {
+          "name": "actual_departure",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crew": {
+          "name": "crew",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_cents": {
+          "name": "price_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'scheduled'"
+        },
+        "gcal_event_id": {
+          "name": "gcal_event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crew_size": {
+          "name": "crew_size",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_source": {
+          "name": "actual_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "appointments_property_start": {
+          "name": "appointments_property_start",
+          "columns": [
+            {
+              "expression": "property_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "int8_ops"
+            },
+            {
+              "expression": "scheduled_start",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "int8_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "appointments_property_id_fkey": {
+          "name": "appointments_property_id_fkey",
+          "tableFrom": "appointments",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "property_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "appointments_service_plan_id_fkey": {
+          "name": "appointments_service_plan_id_fkey",
+          "tableFrom": "appointments",
+          "tableTo": "service_plans",
+          "columnsFrom": [
+            "service_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "appointments_gcal_event_id_key": {
+          "name": "appointments_gcal_event_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "gcal_event_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "appointments_status_check": {
+          "name": "appointments_status_check",
+          "value": "status = ANY (ARRAY['scheduled'::text, 'completed'::text, 'cancelled'::text, 'no_show'::text])"
+        },
+        "appointments_crew_size_check": {
+          "name": "appointments_crew_size_check",
+          "value": "(crew_size >= 1) AND (crew_size <= 6)"
+        },
+        "appointments_actual_source_check": {
+          "name": "appointments_actual_source_check",
+          "value": "actual_source = ANY (ARRAY['gps'::text, 'manual'::text, 'gcal_backfill'::text])"
+        },
+        "actual_times_in_order": {
+          "name": "actual_times_in_order",
+          "value": "(actual_arrival IS NULL) OR (actual_departure IS NULL) OR (actual_departure > actual_arrival)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.contacts": {
+      "name": "contacts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sms_opt_in": {
+          "name": "sms_opt_in",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {
+        "contacts_phone": {
+          "name": "contacts_phone",
+          "columns": [
+            {
+              "expression": "phone",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "one_primary_contact": {
+          "name": "one_primary_contact",
+          "columns": [
+            {
+              "expression": "customer_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "int8_ops"
+            }
+          ],
+          "isUnique": true,
+          "where": "is_primary",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "contacts_customer_id_fkey": {
+          "name": "contacts_customer_id_fkey",
+          "tableFrom": "contacts",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.customers": {
+      "name": "customers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customer_code": {
+          "name": "customer_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "customer_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'residential'"
+        },
+        "status": {
+          "name": "status",
+          "type": "customer_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'lead'"
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripe_customer_id": {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referred_by_id": {
+          "name": "referred_by_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_DATE"
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_reasons": {
+          "name": "end_reasons",
+          "type": "end_reason[]",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "customers_referred_by_id_fkey": {
+          "name": "customers_referred_by_id_fkey",
+          "tableFrom": "customers",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "referred_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "customers_customer_code_key": {
+          "name": "customers_customer_code_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "customer_code"
+          ]
+        },
+        "customers_stripe_customer_id_key": {
+          "name": "customers_stripe_customer_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "stripe_customer_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "customers_check": {
+          "name": "customers_check",
+          "value": "(first_name IS NOT NULL) OR (company_name IS NOT NULL)"
+        },
+        "customers_end_date_status_check": {
+          "name": "customers_end_date_status_check",
+          "value": "(status = 'inactive'::customer_status) = (end_date IS NOT NULL)"
+        },
+        "customers_end_after_start_check": {
+          "name": "customers_end_after_start_check",
+          "value": "(end_date IS NULL) OR (end_date >= start_date)"
+        },
+        "customers_end_reasons_status_check": {
+          "name": "customers_end_reasons_status_check",
+          "value": "(status = 'inactive'::customer_status) OR (cardinality(end_reasons) = 0)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.gps_stops": {
+      "name": "gps_stops",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "vehicle": {
+          "name": "vehicle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "arrived_at": {
+          "name": "arrived_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "departed_at": {
+          "name": "departed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lng": {
+          "name": "lng",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "appointment_id": {
+          "name": "appointment_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "distance_m": {
+          "name": "distance_m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resolved": {
+          "name": "resolved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "gps_stops_property_id_fkey": {
+          "name": "gps_stops_property_id_fkey",
+          "tableFrom": "gps_stops",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "property_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "gps_stops_appointment_id_fkey": {
+          "name": "gps_stops_appointment_id_fkey",
+          "tableFrom": "gps_stops",
+          "tableTo": "appointments",
+          "columnsFrom": [
+            "appointment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "gps_stops_vehicle_arrived_at_key": {
+          "name": "gps_stops_vehicle_arrived_at_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "arrived_at",
+            "vehicle"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "gps_stops_confidence_check": {
+          "name": "gps_stops_confidence_check",
+          "value": "confidence = ANY (ARRAY['high'::text, 'medium'::text, 'review'::text, 'no_match'::text])"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.gps_trips": {
+      "name": "gps_trips",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "vehicle": {
+          "name": "vehicle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_address": {
+          "name": "start_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_address": {
+          "name": "end_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_lat": {
+          "name": "end_lat",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_lng": {
+          "name": "end_lng",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "miles": {
+          "name": "miles",
+          "type": "numeric(7, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fuel_gal": {
+          "name": "fuel_gal",
+          "type": "numeric(6, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_file": {
+          "name": "source_file",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imported_at": {
+          "name": "imported_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "gps_trips_vehicle_started_at_key": {
+          "name": "gps_trips_vehicle_started_at_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "started_at",
+            "vehicle"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.payments": {
+      "name": "payments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "appointment_id": {
+          "name": "appointment_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "method": {
+          "name": "method",
+          "type": "pay_method",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payer_name": {
+          "name": "payer_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripe_invoice_id": {
+          "name": "stripe_invoice_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paid_at": {
+          "name": "paid_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "payments_customer_paid": {
+          "name": "payments_customer_paid",
+          "columns": [
+            {
+              "expression": "customer_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "int8_ops"
+            },
+            {
+              "expression": "paid_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "first",
+              "opclass": "int8_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "payments_customer_id_fkey": {
+          "name": "payments_customer_id_fkey",
+          "tableFrom": "payments",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "payments_appointment_id_fkey": {
+          "name": "payments_appointment_id_fkey",
+          "tableFrom": "payments",
+          "tableTo": "appointments",
+          "columnsFrom": [
+            "appointment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "payments_stripe_invoice_id_key": {
+          "name": "payments_stripe_invoice_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "stripe_invoice_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.properties": {
+      "name": "properties",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "street": {
+          "name": "street",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MD'"
+        },
+        "zip": {
+          "name": "zip",
+          "type": "char(5)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lat": {
+          "name": "lat",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lng": {
+          "name": "lng",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zone": {
+          "name": "zone",
+          "type": "service_zone",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_notes": {
+          "name": "access_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "service_notes": {
+          "name": "service_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "properties_customer_id_fkey": {
+          "name": "properties_customer_id_fkey",
+          "tableFrom": "properties",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "properties_zip_check": {
+          "name": "properties_zip_check",
+          "value": "zip ~ '^\\d{5}$'::text"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.service_plans": {
+      "name": "service_plans",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "frequency",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rate_cents": {
+          "name": "rate_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "preferred_weekday": {
+          "name": "preferred_weekday",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weeks_of_month": {
+          "name": "weeks_of_month",
+          "type": "smallint[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "default_payment_method": {
+          "name": "default_payment_method",
+          "type": "pay_method",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripe_subscription_id": {
+          "name": "stripe_subscription_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_DATE"
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "one_open_plan_per_property": {
+          "name": "one_open_plan_per_property",
+          "columns": [
+            {
+              "expression": "property_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "int8_ops"
+            }
+          ],
+          "isUnique": true,
+          "where": "(end_date IS NULL)",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "service_plans_property_id_fkey": {
+          "name": "service_plans_property_id_fkey",
+          "tableFrom": "service_plans",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "property_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "service_plans_stripe_subscription_id_key": {
+          "name": "service_plans_stripe_subscription_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "stripe_subscription_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "service_plans_rate_cents_check": {
+          "name": "service_plans_rate_cents_check",
+          "value": "rate_cents >= 0"
+        },
+        "service_plans_preferred_weekday_check": {
+          "name": "service_plans_preferred_weekday_check",
+          "value": "(preferred_weekday >= 0) AND (preferred_weekday <= 6)"
+        },
+        "service_plans_check": {
+          "name": "service_plans_check",
+          "value": "(end_date IS NULL) OR (end_date >= start_date)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.visit_history": {
+      "name": "visit_history",
+      "schema": "",
+      "columns": {
+        "customer_code": {
+          "name": "customer_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "visit_date": {
+          "name": "visit_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arrival": {
+          "name": "arrival",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "departure": {
+          "name": "departure",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calendar_label": {
+          "name": "calendar_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.customer_status": {
+      "name": "customer_status",
+      "schema": "public",
+      "values": [
+        "lead",
+        "active",
+        "paused",
+        "inactive"
+      ]
+    },
+    "public.customer_type": {
+      "name": "customer_type",
+      "schema": "public",
+      "values": [
+        "residential",
+        "commercial",
+        "referral_partner"
+      ]
+    },
+    "public.end_reason": {
+      "name": "end_reason",
+      "schema": "public",
+      "values": [
+        "quality",
+        "scheduling_communication",
+        "client_circumstances"
+      ]
+    },
+    "public.frequency": {
+      "name": "frequency",
+      "schema": "public",
+      "values": [
+        "one_time",
+        "weekly",
+        "biweekly",
+        "every_4_weeks",
+        "monthly",
+        "every_2_months"
+      ]
+    },
+    "public.pay_method": {
+      "name": "pay_method",
+      "schema": "public",
+      "values": [
+        "stripe",
+        "zelle_business",
+        "zelle_personal",
+        "venmo",
+        "check",
+        "cash",
+        "other"
+      ]
+    },
+    "public.service_zone": {
+      "name": "service_zone",
+      "schema": "public",
+      "values": [
+        "south",
+        "northwest",
+        "city_core",
+        "north_northeast",
+        "other"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.client_time_stats": {
+      "columns": {
+        "customer_code": {
+          "name": "customer_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "client": {
+          "name": "client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "visits": {
+          "name": "visits",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "median_min": {
+          "name": "median_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avg_min": {
+          "name": "avg_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "min_min": {
+          "name": "min_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max_min": {
+          "name": "max_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_visit": {
+          "name": "last_visit",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revenue_per_onsite_hr": {
+          "name": "revenue_per_onsite_hr",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT customer_code, client, property_id, count(*) AS visits, percentile_cont(0.5::double precision) WITHIN GROUP (ORDER BY (onsite_min::double precision))::integer AS median_min, round(avg(onsite_min))::integer AS avg_min, min(onsite_min) AS min_min, max(onsite_min) AS max_min, max(visit_date) AS last_visit, round(sum(price_cents) FILTER (WHERE price_cents > 0)::numeric / 100.0 / NULLIF(sum(onsite_min) FILTER (WHERE price_cents > 0), 0)::numeric * 60::numeric, 2) AS revenue_per_onsite_hr FROM visit_durations WHERE visit_date >= (CURRENT_DATE - 180) GROUP BY customer_code, client, property_id",
+      "name": "client_time_stats",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.data_issues": {
+      "columns": {
+        "issue": {
+          "name": "issue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_code": {
+          "name": "customer_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "client": {
+          "name": "client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "detail": {
+          "name": "detail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT 'no property'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, NULL::text AS detail FROM customers c WHERE c.status = 'active'::customer_status AND NOT (EXISTS ( SELECT 1 FROM properties p WHERE p.customer_id = c.id)) UNION ALL SELECT 'no service plan'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, p.street AS detail FROM properties p JOIN customers c ON c.id = p.customer_id WHERE p.is_active AND NOT (EXISTS ( SELECT 1 FROM service_plans sp WHERE sp.property_id = p.id AND sp.end_date IS NULL)) UNION ALL SELECT 'no primary phone'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, NULL::text AS detail FROM customers c WHERE c.status = 'active'::customer_status AND NOT (EXISTS ( SELECT 1 FROM contacts ct WHERE ct.customer_id = c.id AND ct.is_primary AND ct.phone IS NOT NULL)) UNION ALL SELECT 'shared phone'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, ct.phone AS detail FROM contacts ct JOIN customers c ON c.id = ct.customer_id WHERE (ct.phone IN ( SELECT contacts.phone FROM contacts WHERE contacts.phone IS NOT NULL GROUP BY contacts.phone HAVING count(DISTINCT contacts.customer_id) > 1)) UNION ALL SELECT 'shared address'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, p.street AS detail FROM properties p JOIN customers c ON c.id = p.customer_id WHERE (lower(p.street) IN ( SELECT lower(properties.street) AS lower FROM properties GROUP BY (lower(properties.street)) HAVING count(DISTINCT properties.customer_id) > 1)) UNION ALL SELECT 'visit priced $0'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, to_char((a.scheduled_start AT TIME ZONE 'America/New_York'::text), 'MM/DD/YYYY'::text) AS detail FROM appointments a JOIN properties p ON p.id = a.property_id JOIN customers c ON c.id = p.customer_id WHERE a.status = 'completed'::text AND a.price_cents = 0 UNION ALL SELECT 'odd duration'::text AS issue, visit_durations.customer_code, visit_durations.client, ((visit_durations.visit_date || ': '::text) || visit_durations.onsite_min) || ' min'::text AS detail FROM visit_durations WHERE visit_durations.onsite_min < 30 OR visit_durations.onsite_min > 360 UNION ALL SELECT 'double-booked day'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, to_char((a.scheduled_start AT TIME ZONE 'America/New_York'::text), 'MM/DD/YYYY'::text) AS detail FROM appointments a JOIN properties p ON p.id = a.property_id JOIN customers c ON c.id = p.customer_id WHERE a.status <> 'cancelled'::text GROUP BY c.customer_code, (concat_ws(' '::text, c.first_name, c.last_name, c.company_name)), a.property_id, (to_char((a.scheduled_start AT TIME ZONE 'America/New_York'::text), 'MM/DD/YYYY'::text)) HAVING count(*) > 1 UNION ALL SELECT 'active, no visit in 60 days'::text AS issue, c.customer_code, concat_ws(' '::text, c.first_name, c.last_name, c.company_name) AS client, COALESCE('last: '::text || max((a.actual_arrival AT TIME ZONE 'America/New_York'::text)::date)::text, 'never'::text) AS detail FROM customers c LEFT JOIN properties p ON p.customer_id = c.id LEFT JOIN appointments a ON a.property_id = p.id AND a.status = 'completed'::text WHERE c.status = 'active'::customer_status GROUP BY c.id HAVING COALESCE(max(a.actual_arrival), '-infinity'::timestamp with time zone) < (now() - '60 days'::interval)",
+      "name": "data_issues",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.house_profitability": {
+      "columns": {
+        "customer_code": {
+          "name": "customer_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "client": {
+          "name": "client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zone": {
+          "name": "zone",
+          "type": "service_zone",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "frequency",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rate": {
+          "name": "rate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "visits": {
+          "name": "visits",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "median_min": {
+          "name": "median_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revenue_per_hr": {
+          "name": "revenue_per_hr",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monthly_revenue": {
+          "name": "monthly_revenue",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT s.customer_code, s.client, concat_ws(', '::text, p.street, p.city) AS address, p.zone, sp.frequency, round(sp.rate_cents::numeric / 100.0, 2) AS rate, s.visits, s.median_min, round(sp.rate_cents::numeric / 100.0 / NULLIF(s.median_min, 0)::numeric * 60::numeric, 2) AS revenue_per_hr, round(sp.rate_cents::numeric / 100.0 * CASE sp.frequency WHEN 'weekly'::frequency THEN 52::numeric / 12.0 WHEN 'biweekly'::frequency THEN 26::numeric / 12.0 WHEN 'every_4_weeks'::frequency THEN 13::numeric / 12.0 WHEN 'monthly'::frequency THEN 1::numeric WHEN 'every_2_months'::frequency THEN 0.5 ELSE 0::numeric END, 2) AS monthly_revenue FROM client_time_stats s JOIN properties p ON p.id = s.property_id JOIN service_plans sp ON sp.property_id = s.property_id AND sp.end_date IS NULL ORDER BY (round(sp.rate_cents::numeric / 100.0 / NULLIF(s.median_min, 0)::numeric * 60::numeric, 2)) DESC",
+      "name": "house_profitability",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.monthly_revenue": {
+      "columns": {
+        "month": {
+          "name": "month",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revenue": {
+          "name": "revenue",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT date_trunc('month'::text, paid_at) AS month, sum(amount_cents)::numeric / 100.0 AS revenue FROM payments GROUP BY (date_trunc('month'::text, paid_at)) ORDER BY (date_trunc('month'::text, paid_at))",
+      "name": "monthly_revenue",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.visit_durations": {
+      "columns": {
+        "appointment_id": {
+          "name": "appointment_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_code": {
+          "name": "customer_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "client": {
+          "name": "client",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "visit_date": {
+          "name": "visit_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_arrival": {
+          "name": "actual_arrival",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_departure": {
+          "name": "actual_departure",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "onsite_min": {
+          "name": "onsite_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "labor_min": {
+          "name": "labor_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crew": {
+          "name": "crew",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crew_size": {
+          "name": "crew_size",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_cents": {
+          "name": "price_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_source": {
+          "name": "actual_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT a.id AS appointment_id, c.customer_code, COALESCE(NULLIF(concat_ws(' '::text, c.first_name, c.last_name), ''::text), c.company_name) AS client, a.property_id, (a.actual_arrival AT TIME ZONE 'America/New_York'::text)::date AS visit_date, a.actual_arrival, a.actual_departure, round(EXTRACT(epoch FROM a.actual_departure - a.actual_arrival) / 60::numeric)::integer AS onsite_min, round(EXTRACT(epoch FROM a.actual_departure - a.actual_arrival) / 60::numeric * a.crew_size::numeric)::integer AS labor_min, a.crew, a.crew_size, a.price_cents, a.actual_source FROM appointments a JOIN properties p ON p.id = a.property_id JOIN customers c ON c.id = p.customer_id WHERE a.status = 'completed'::text AND a.actual_arrival IS NOT NULL AND a.actual_departure IS NOT NULL",
+      "name": "visit_durations",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    }
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
