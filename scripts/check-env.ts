@@ -19,7 +19,7 @@ if (production) {
   if (process.env.BOUNCIE_REDIRECT_URI && !process.env.BOUNCIE_REDIRECT_URI.startsWith("https://")) problems.push("BOUNCIE_REDIRECT_URI must be the https:// production address.");
   // the public demo must never hold a real account's keys
   if (process.env.DEMO_MODE === "1") {
-    const real = ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", ...bouncie].filter((k) => process.env[k]?.trim());
+    const real = ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "BOUNCIE_WEBHOOK_KEY", ...bouncie].filter((k) => process.env[k]?.trim());
     if (real.length) problems.push(`The demo (DEMO_MODE=1) must not have ${real.join(", ")} set: remove them.`);
     if ((process.env.CRON_SECRET?.trim() ?? "").length < 16) problems.push("CRON_SECRET is missing or short; the nightly demo reset needs it.");
   }

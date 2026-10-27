@@ -3,8 +3,10 @@ import "server-only";
 import { and, asc, desc, eq, gte, lt, lte, sql, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { outer } from "@/lib/db-helpers";
-import { customers, invoices, properties, users } from "@/db/schema";
+import type Stripe from "stripe";
+import { appointments, customers, invoices, properties, users } from "@/db/schema";
 import { requireUser } from "@/lib/auth/session";
+import { isDemo } from "@/lib/demo";
 import { TIME_ZONE } from "@/lib/i18n/config";
 import { stripe } from "@/lib/stripe";
 import { displayName } from "../customers/options";
@@ -217,6 +219,7 @@ export async function getInvoiceDetail(id: number) {
     .leftJoin(users, eq(users.id, invoices.paidByUserId))
     .where(eq(invoices.id, id));
   if (!row) return null;
+  if (isDemo()) return { ...row, ...(await demoStripeCopy(row.invoice)) };
   const stripeInvoice = await stripe().invoices.retrieve(row.invoice.stripeInvoiceId);
   const listed = await stripe()
     .invoices.listLineItems(row.invoice.stripeInvoiceId, { limit: 100 })
@@ -230,7 +233,34 @@ export async function getInvoiceDetail(id: number) {
   return { ...row, stripeInvoice, lines };
 }
 
-export type CardOnFile = { id: string; label: string; expires: string; isDefault: boolean; isExpired: boolean };
+// The demo has no Stripe account: the parts of Stripe's copy the invoice page
+// shows, made from ours (one line for the visit it bills).
+async function demoStripeCopy(inv: typeof invoices.$inferSelect) {
+  const [visit] = inv.appointmentId
+    ? await db
+        .select({ day: sql<string>`to_char(${appointments.scheduledStart} at time zone ${TIME_ZONE}, 'YYYY-MM-DD')` })
+        .from(appointments)
+        .where(eq(appointments.id, inv.appointmentId))
+    : [];
+  const stripeInvoice = {
+    total: inv.totalCents,
+    amount_remaining: inv.amountRemainingCents,
+    collection_method: "send_invoice",
+    description: null,
+    created: Math.floor(Date.parse(inv.createdAt) / 1000),
+  } as Stripe.Invoice;
+  const line = {
+    id: `il_demo_${inv.id}`,
+    description: inv.description ?? "Cleaning",
+    quantity: 1,
+    amount: inv.totalCents,
+    metadata: visit ? { service_date: visit.day } : {},
+    period: null,
+  } as unknown as Stripe.InvoiceLineItem;
+  return { stripeInvoice, lines: [line] };
+}
+
+export type CardOnFile ={ id: string; label: string; expires: string; isDefault: boolean; isExpired: boolean };
 
 // The cards saved on a Stripe customer, their default first. Expired cards are
 // listed but can't be charged.

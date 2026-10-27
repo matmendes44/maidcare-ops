@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { outer } from "@/lib/db-helpers";
 import { appointments, customers, fleetSync, properties, vehicleServiceRecords, vehicles, vehicleTrips } from "@/db/schema";
 import { requireUser } from "@/lib/auth/session";
+import { fleetSource } from "@/lib/bouncie/client";
 import { bouncieConfig, getConnection } from "@/lib/bouncie/tokens";
 import { estimatedDriveMinutes, nearest } from "@/lib/fleet/geo";
 import { TIME_ZONE } from "@/lib/i18n/config";
@@ -22,17 +23,18 @@ const nextMidnight = (day: string) => sql`((${day}::date + 1)::timestamp at time
 
 export async function getFleetStatus() {
   await requireUser();
-  const [sync, connection, pendingLookups, linked, active] = await Promise.all([
+  const [sync, connection, current, pendingLookups, linked, active] = await Promise.all([
     db.query.fleetSync.findFirst({ where: eq(fleetSync.id, 1) }),
     getConnection(),
+    // the same rule the sync uses (Bouncie, the simulator, or nothing)
+    fleetSource(),
     db.$count(properties, and(isNull(properties.geocodedAt), isNull(properties.lat))),
     db.$count(vehicles, and(isNotNull(vehicles.bouncieImei), eq(vehicles.isActive, true))),
     db.$count(vehicles, eq(vehicles.isActive, true)),
   ]);
   const configured = Boolean(bouncieConfig());
-  const source = configured && connection ? "bouncie" : process.env.NODE_ENV === "production" ? null : "simulated";
   return {
-    source,
+    source: current?.kind ?? null,
     configured,
     webhookConfigured: Boolean(process.env.BOUNCIE_WEBHOOK_KEY?.trim()),
     connection: connection ? { email: connection.accountEmail, connectedAt: connection.connectedAt } : null,
