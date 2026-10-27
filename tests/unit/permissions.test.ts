@@ -3,20 +3,28 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { canChangeAppointment } from "../../lib/appointments/access";
-import { can, permissions, roles, type Permission } from "../../lib/auth/permissions";
+import { allowed, can, demoBlocked, permissions, roles, type Permission } from "../../lib/auth/permissions";
 import { canEditExpense } from "../../lib/expenses/access";
 import { expenseChanges } from "../../lib/expenses/changes";
 
 const all = Object.keys(permissions) as Permission[];
 
+// The rules are checked through allowed(), which takes the demo flag as an
+// argument, so the result doesn't depend on DEMO_MODE in the environment.
 test("the owner can do everything", () => {
-  for (const p of all) assert.equal(can({ role: "owner" }, p), true, p);
+  for (const p of all) assert.equal(allowed("owner", p, false), true, p);
+});
+
+test("the demo blocks users, Stripe and Bouncie for everyone, owner included", () => {
+  for (const p of demoBlocked) for (const role of roles) assert.equal(allowed(role, p, true), false, `${role} ${p}`);
+  // everything else the owner can still do
+  for (const p of all.filter((p) => !demoBlocked.includes(p))) assert.equal(allowed("owner", p, true), true, p);
 });
 
 test("admin and staff can't move money, delete, or manage users yet", () => {
   for (const role of ["admin", "staff"] as const) {
     for (const p of ["invoices.collect", "invoices.finalize", "invoices.deleteDraft", "customers.delete", "users.manage"] as Permission[]) {
-      assert.equal(can({ role }, p), false, `${role} ${p}`);
+      assert.equal(allowed(role, p, false), false, `${role} ${p}`);
     }
   }
 });
@@ -30,9 +38,8 @@ test("three roles", () => {
 });
 
 test("staff: estimates, one-time expenses and reports; nothing else", () => {
-  const staff = { role: "staff" as const };
-  const allowed = all.filter((p) => can(staff, p)).sort();
-  assert.deepEqual(allowed, ["expenses.create", "expenses.view", "quotes.manage", "reports.view"]);
+  const granted = all.filter((p) => allowed("staff", p, false)).sort();
+  assert.deepEqual(granted, ["expenses.create", "expenses.view", "quotes.manage", "reports.view"]);
 });
 
 test("staff can change today's and future appointments only", () => {

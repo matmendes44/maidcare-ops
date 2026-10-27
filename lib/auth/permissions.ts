@@ -5,7 +5,7 @@
 // has decided on (see their list below); admin keeps the everyday work it has
 // always had until its duties are decided. Add a permission to a role's list
 // to allow it.
-import { demoBlocked, isDemo } from "@/lib/demo";
+import { isDemo } from "@/lib/demo";
 
 export const roles = ["owner", "admin", "staff"] as const;
 export type Role = (typeof roles)[number];
@@ -56,9 +56,18 @@ const granted: Record<Role, readonly Permission[] | "all"> = {
 
 export const roleLabels: Record<Role, string> = { owner: "Owner", admin: "Admin", staff: "Staff" };
 
-export function can(user: { role: Role } | null | undefined, permission: Permission) {
-  if (!user) return false;
-  if (isDemo() && demoBlocked.includes(permission)) return false;
-  const list = granted[user.role];
+// Off for everyone in the public demo, owner included: these would let one
+// visitor lock the others out, or try to reach a real Stripe or Bouncie account.
+export const demoBlocked: readonly Permission[] = ["users.manage", "fleet.manage", "stripe.manage"];
+
+// The rule itself, with nothing read from the environment.
+export function allowed(role: Role, permission: Permission, demo: boolean) {
+  if (demo && demoBlocked.includes(permission)) return false;
+  const list = granted[role];
   return list === "all" || list.includes(permission);
+}
+
+// What the app calls: the rule for the signed-in user, in this deployment.
+export function can(user: { role: Role } | null | undefined, permission: Permission) {
+  return !!user && allowed(user.role, permission, isDemo());
 }

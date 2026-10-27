@@ -1,0 +1,24 @@
+# Typecheck, lint and unit tests on every push and pull request, with a clean
+# environment (no database, no secrets, no DEMO_MODE).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Next generates the route types (PageProps) the typecheck needs
+      - run: npx next typegen
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run test:unit
